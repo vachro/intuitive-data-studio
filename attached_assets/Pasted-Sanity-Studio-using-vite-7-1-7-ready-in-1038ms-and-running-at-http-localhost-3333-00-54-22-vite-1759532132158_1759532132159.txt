@@ -1,0 +1,34 @@
+Sanity Studio using vite@7.1.7 ready in 1038ms and running at http://localhost:3333/
+00:54:22 [vite] (client) page reload schemaTypes/category.ts
+00:54:22 [vite] (client) page reload sanity.config.ts
+00:54:22 [vite] (client) page reload schemaTypes/post.ts
+00:54:48 [vite] (client) Pre-transform error: Failed to resolve import "@sanity/document-internationalization" from "sanity.config.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/MortenEspelid/dev/idata/intuitive-data-studio/studio3/sanity.config.ts:4:43
+  2  |  import { structureTool } from "sanity/structure";
+  3  |  import { visionTool } from "@sanity/vision";
+  4  |  import { documentInternationalization } from "@sanity/document-internationalization";
+     |                                                ^
+  5  |  import { schemaTypes } from "./schemaTypes";
+  6  |  export default defineConfig({
+00:54:48 [vite] Internal server error: Failed to resolve import "@sanity/document-internationalization" from "sanity.config.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/MortenEspelid/dev/idata/intuitive-data-studio/studio3/sanity.config.ts:4:43
+  2  |  import { structureTool } from "sanity/structure";
+  3  |  import { visionTool } from "@sanity/vision";
+  4  |  import { documentInternationalization } from "@sanity/document-internationalization";
+     |                                                ^
+  5  |  import { schemaTypes } from "./schemaTypes";
+  6  |  export default defineConfig({
+      at TransformPluginContext._formatLog (file:///C:/Users/MortenEspelid/dev/idata/intuitive-data-studio/studio3/node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:31185:43)
+      at TransformPluginContext.error (file:///C:/Users/MortenEspelid/dev/idata/intuitive-data-studio/studio3/node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:31182:14)
+      at normalizeUrl (file:///C:/Users/MortenEspelid/dev/idata/intuitive-data-studio/studio3/node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:29665:18)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at async file:///C:/Users/MortenEspelid/dev/idata/intuitive-data-studio/studio3/node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:29723:32
+      at async Promise.all (index 3)
+      at async TransformPluginContext.transform (file:///C:/Users/MortenEspelid/dev/idata/intuitive-data-studio/studio3/node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:29691:4)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/MortenEspelid/dev/idata/intuitive-data-studio/studio3/node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:30984:14)      
+      at async loadAndTransform (file:///C:/Users/MortenEspelid/dev/idata/intuitive-data-studio/studio3/node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:26116:26)
+      at async viteTransformMiddleware (file:///C:/Users/MortenEspelid/dev/idata/intuitive-data-studio/studio3/node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:27187:20)
+
+
