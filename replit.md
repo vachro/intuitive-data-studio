@@ -84,13 +84,14 @@ npm run dev -- --port 5000 --host 0.0.0.0
 The project is configured for deployment using Replit's deployment system. The build command compiles the Sanity Studio, and the run command serves it in production mode.
 
 ## Recent Changes
-- **2025-10-03:** Initial Replit setup
+- **2025-10-03:** Initial Replit setup and Vite host fix
   - Installed Node.js 20 and dependencies
   - Configured port 5000 with host 0.0.0.0
   - Set up Sanity Studio workflow
   - Updated Sanity packages to v4.10.2
   - Created .gitignore for Node.js projects
   - Configured deployment settings
+  - Fixed Vite host blocking by setting `allowedHosts: true` in vite.config.ts
 
 ## Notes
 - Sanity Studio requires authentication to access the content
