@@ -5,15 +5,9 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: true,
-    allowedHosts: [
-      '*.repl.co',
-      '*.repl.run'
-    ]
+    allowedHosts: true
   },
   preview: {
-    allowedHosts: [
-      '*.repl.co',
-      '*.repl.run'
-    ]
+    allowedHosts: true
   }
 });
