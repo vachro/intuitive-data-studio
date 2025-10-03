@@ -36,3 +36,8 @@ externalPort = 80
 [[ports]]
 localPort = 34353
 externalPort = 3000
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["bash", "-c", "cd studio3 && npx sanity start --port 5000 --host 0.0.0.0"]
+build = ["bash", "-c", "cd studio3 && npm install && npm run build"]
