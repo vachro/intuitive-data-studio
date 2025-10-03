@@ -6,6 +6,12 @@ export default defineType({
   type: 'document',
   fields: [
     defineField({
+      name: 'language',
+      type: 'string',
+      readOnly: true,
+      hidden: true,
+    }),
+    defineField({
       name: 'title',
       title: 'Title',
       type: 'string',
@@ -16,4 +22,18 @@ export default defineType({
       type: 'text',
     }),
   ],
+  preview: {
+    select: {
+      title: 'title',
+      language: 'language',
+    },
+    prepare(selection) {
+      const {title, language} = selection
+      const langFlag = language ? `[${language.toUpperCase()}]` : ''
+      return {
+        title,
+        subtitle: langFlag || undefined,
+      }
+    },
+  },
 })

@@ -6,6 +6,12 @@ export default defineType({
   type: 'document',
   fields: [
     defineField({
+      name: 'language',
+      type: 'string',
+      readOnly: true,
+      hidden: true,
+    }),
+    defineField({
       name: 'title',
       title: 'Title',
       type: 'string',
@@ -56,10 +62,14 @@ export default defineType({
       title: 'title',
       author: 'author.name',
       media: 'mainImage',
+      language: 'language',
     },
     prepare(selection) {
-      const {author} = selection
-      return {...selection, subtitle: author && `by ${author}`}
+      const {author, language} = selection
+      const langFlag = language ? `[${language.toUpperCase()}]` : ''
+      const authorText = author ? `by ${author}` : ''
+      const subtitle = [langFlag, authorText].filter(Boolean).join(' ')
+      return {...selection, subtitle: subtitle || undefined}
     },
   },
 })
