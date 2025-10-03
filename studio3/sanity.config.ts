@@ -15,4 +15,9 @@ export default defineConfig({
   schema: {
     types: schemaTypes,
   },
+
+  server: {
+    port: 5000,
+    hostname: '0.0.0.0',
+  },
 })
