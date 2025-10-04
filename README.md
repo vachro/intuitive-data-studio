@@ -34,3 +34,6 @@ npm run dev
 }
 
 Bruk ISR + webhooks fra Sanity for revalidate, og Preview Mode for utkast.
+
+
+Deummy endring
