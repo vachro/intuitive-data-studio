@@ -17,6 +17,7 @@
   "dependencies": {
     "@sanity/document-internationalization": "^4.0.0",
     "@sanity/vision": "^4.10.2",
+    "openai": "^6.2.0",
     "react": "^19.1",
     "react-dom": "^19.1",
     "sanity": "^4.10.2",
