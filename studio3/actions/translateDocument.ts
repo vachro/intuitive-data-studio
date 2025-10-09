@@ -1,6 +1,4 @@
-import {useState} from 'react'
 import {DocumentActionComponent} from 'sanity'
-import {useToast} from '@sanity/ui'
 import {TranslateIcon} from '@sanity/icons'
 import {translationConfig} from '../translationConfig'
 
@@ -14,9 +12,6 @@ interface TranslationDocument {
 }
 
 export const translateDocumentAction: DocumentActionComponent = (props) => {
-  const [isTranslating, setIsTranslating] = useState(false)
-  const toast = useToast()
-
   if (props.type !== 'post' && props.type !== 'category') {
     return null
   }
@@ -25,11 +20,7 @@ export const translateDocumentAction: DocumentActionComponent = (props) => {
     try {
       const doc = props.draft || props.published
       if (!doc) {
-        toast.push({
-          status: 'error',
-          title: 'No document found',
-          description: 'Save the document first before translating',
-        })
+        alert('No document found. Save the document first before translating.')
         return
       }
 
@@ -44,43 +35,24 @@ export const translateDocumentAction: DocumentActionComponent = (props) => {
 
       const validLanguages = ['en', 'de', 'es', 'fr', 'no']
       if (!validLanguages.includes(targetLanguage.toLowerCase())) {
-        toast.push({
-          status: 'error',
-          title: 'Invalid language code',
-          description: `"${targetLanguage}" is not valid. Use: en, de, es, fr, no`,
-        })
+        alert(`Invalid language code: "${targetLanguage}". Use: en, de, es, fr, no`)
         return
       }
 
       if (targetLanguage === currentLanguage) {
-        toast.push({
-          status: 'warning',
-          title: 'Same language',
-          description: 'Target language is the same as source language',
-        })
+        alert('Target language is the same as source language')
         return
       }
 
       const apiKey = import.meta.env.SANITY_STUDIO_OPENAI_API_KEY
       if (!apiKey) {
-        toast.push({
-          status: 'error',
-          title: 'API key missing',
-          description: 'Add SANITY_STUDIO_OPENAI_API_KEY to .env.local',
-          duration: 10000,
-        })
+        console.error('❌ API key missing!')
         console.error('Create a .env.local file with: SANITY_STUDIO_OPENAI_API_KEY=your-key-here')
+        alert('API key missing. Add SANITY_STUDIO_OPENAI_API_KEY to .env.local and restart the server.')
         return
       }
 
-      setIsTranslating(true)
-
-      toast.push({
-        status: 'info',
-        title: `Translating to ${targetLanguage.toUpperCase()}...`,
-        description: 'This may take a moment',
-        duration: 5000,
-      })
+      console.log(`🔄 Translating to ${targetLanguage.toUpperCase()}... (this may take a moment)`)
 
       console.log('📝 Starting translation...')
       console.log('Source language:', currentLanguage)
@@ -129,12 +101,7 @@ export const translateDocumentAction: DocumentActionComponent = (props) => {
       console.log('Full Translated Document:', JSON.stringify(translatedDoc, null, 2))
       console.log('===============================')
 
-      toast.push({
-        status: 'success',
-        title: 'Translation complete!',
-        description: `${languageNames[currentLanguage]} → ${languageNames[targetLanguage]}. Check console (F12) for full translation.`,
-        duration: 10000,
-      })
+      alert(`Translation complete! ${languageNames[currentLanguage]} → ${languageNames[targetLanguage]}\n\nCheck the browser console (F12) for the full translation.`)
 
       console.log('\n📋 NEXT STEPS:')
       console.log('1. Create a new', props.type)
@@ -146,23 +113,15 @@ export const translateDocumentAction: DocumentActionComponent = (props) => {
       console.error('❌ Translation error:', error)
       const errorMsg = error instanceof Error ? error.message : 'Unknown error'
       
-      toast.push({
-        status: 'error',
-        title: 'Translation failed',
-        description: errorMsg,
-        duration: 10000,
-      })
+      alert(`Translation failed: ${errorMsg}\n\nCheck the browser console (F12) for details.`)
       
       console.error('Full error:', error)
-    } finally {
-      setIsTranslating(false)
     }
   }
 
   return {
-    label: isTranslating ? 'Translating...' : 'Translate with AI',
+    label: 'Translate with AI',
     icon: TranslateIcon,
-    disabled: isTranslating,
     onHandle: handleTranslate,
   }
 }
