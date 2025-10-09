@@ -8,7 +8,9 @@ export const translationConfig = {
 
 Provide ONLY the translated text without any explanations or meta-commentary.`,
 
-  model: 'gpt-4o-mini',
+  model: 'gpt-5-mini',
   
   temperature: 0.3,
+  
+  delayBetweenRequests: 100, // milliseconds between API calls to avoid rate limits
 }

@@ -2,26 +2,46 @@
 
 ## Setup
 
-### 1. Add OpenAI API Key
+### 1. Get OpenAI API Access
+
+⚠️ **Important:** ChatGPT subscription ≠ OpenAI API access
+
+- **ChatGPT Plus/Business** ($20-34/month) = Access to ChatGPT interface only
+- **OpenAI API** = Programmatic access (what we need here)
+
+To get API access:
+1. Go to https://platform.openai.com/api-keys
+2. Create an API key
+3. Add payment method (pay-per-use, separate from ChatGPT subscription)
+4. Optionally buy credits
+
+### 2. Add Your API Key
 
 Create a file named `.env.local` in the `studio3` folder:
 
 ```bash
 # studio3/.env.local
-SANITY_STUDIO_OPENAI_API_KEY=your-openai-api-key-here
+SANITY_STUDIO_OPENAI_API_KEY=sk-proj-your-api-key-here
 ```
-
-**Get your API key:** https://platform.openai.com/api-keys
 
 ⚠️ **Important:** Never commit `.env.local` to git (it's already in .gitignore)
 
-### 2. Restart the Studio
+### 3. Restart the Studio
 
 After adding the API key, restart your development server:
 ```bash
 cd studio3
 npm run dev
 ```
+
+## Current Model
+
+The translation uses **gpt-5-mini** for:
+- ✅ Higher rate limits (10,000 requests/minute)
+- ✅ Better translations
+- ✅ Cost-effective
+
+**Rate Limiting:** The system adds 100ms delays between API requests to avoid hitting rate limits.
 
 ## How to Use AI Translation
 
@@ -112,9 +132,16 @@ Use [FORMAL/CASUAL] tone and translate to idiomatic ${targetLanguage}...`
 - Check browser console (F12) for specific error details
 - Verify you restarted the server after adding the API key
 
-**Button stuck as "Translating..."**
-- Refresh the page - a previous error may have left the state stuck
-- Check the console for error messages
+**"429 Too Many Requests" error**
+- Your API rate limit has been exceeded
+- Wait a few seconds and try again
+- For large documents, the system adds 100ms delays automatically
+- Consider upgrading your OpenAI API tier for higher limits
+
+**"ChatGPT subscription doesn't work"**
+- ChatGPT Plus/Business subscription is separate from API access
+- You need an actual API key from platform.openai.com
+- See Setup section above for details
 
 ### Tips
 - 💡 Translate from base language (usually English) to ensure consistency

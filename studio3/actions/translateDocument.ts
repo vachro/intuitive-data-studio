@@ -11,6 +11,10 @@ interface TranslationDocument {
   [key: string]: any
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
 export const translateDocumentAction: DocumentActionComponent = (props) => {
   if (props.type !== 'post' && props.type !== 'category') {
     return null
@@ -61,6 +65,8 @@ export const translateDocumentAction: DocumentActionComponent = (props) => {
       const OpenAI = (await import('openai')).default
       const openai = new OpenAI({apiKey, dangerouslyAllowBrowser: true})
 
+      const delay = translationConfig.delayBetweenRequests || 100
+
       console.log('📄 Translating title...')
       const translatedTitle = await translateText(
         openai,
@@ -68,6 +74,11 @@ export const translateDocumentAction: DocumentActionComponent = (props) => {
         targetLanguage
       )
       console.log('✅ Title translated:', translatedTitle)
+      
+      // Delay before translating body to avoid rate limiting
+      if (delay > 0) {
+        await sleep(delay)
+      }
 
       let translatedBody = (doc as TranslationDocument).body
       if (translatedBody && Array.isArray(translatedBody)) {
@@ -155,6 +166,7 @@ async function translatePortableText(
 ): Promise<any[]> {
   const translatedBlocks = []
   let blockNum = 0
+  const delay = translationConfig.delayBetweenRequests || 100
 
   for (const block of blocks) {
     blockNum++
@@ -173,6 +185,11 @@ async function translatePortableText(
               ...child,
               text: translatedText,
             })
+            
+            // Add delay between requests to avoid rate limiting
+            if (delay > 0) {
+              await sleep(delay)
+            }
           } else {
             translatedChildren.push(child)
           }
