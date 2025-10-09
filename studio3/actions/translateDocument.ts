@@ -1,6 +1,5 @@
-import {DocumentActionComponent} from 'sanity'
-import {TranslateIcon} from '@sanity/icons'
-import {translationConfig} from '../translationConfig'
+import { DocumentActionComponent } from 'sanity'
+import { TranslateIcon } from '@sanity/icons'
 
 interface TranslationDocument {
   _id: string
@@ -11,201 +10,136 @@ interface TranslationDocument {
   [key: string]: any
 }
 
-function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
+let isTranslating = false
 
 export const translateDocumentAction: DocumentActionComponent = (props) => {
-  if (props.type !== 'post' && props.type !== 'category') {
-    return null
-  }
+  if (props.type !== 'post' && props.type !== 'category') return null
 
   const handleTranslate = async () => {
+    if (isTranslating) {
+      alert('Translation already in progress. Please wait...')
+      return
+    }
+
+    isTranslating = true
     try {
-      const doc = props.draft || props.published
+      const doc = (props.draft || props.published) as TranslationDocument
       if (!doc) {
         alert('No document found. Save the document first before translating.')
         return
       }
 
-      const currentLanguage = (doc as TranslationDocument).language || 'en'
-      
+      const currentLanguage = doc.language || 'en'
       const targetLanguage = window.prompt(
-        `Current language: ${currentLanguage.toUpperCase()}\n\nEnter target language code:\n• en (English)\n• de (Deutsch)\n• es (Español)\n• fr (Français)\n• no (Norsk)`,
+        `Current language: ${currentLanguage.toUpperCase()}\n\nEnter target language code:\n• en • de • es • fr • no`,
         currentLanguage === 'en' ? 'no' : 'en'
       )
-
       if (!targetLanguage) return
 
-      const validLanguages = ['en', 'de', 'es', 'fr', 'no']
-      if (!validLanguages.includes(targetLanguage.toLowerCase())) {
+      const valid = ['en', 'de', 'es', 'fr', 'no']
+      if (!valid.includes(targetLanguage.toLowerCase())) {
         alert(`Invalid language code: "${targetLanguage}". Use: en, de, es, fr, no`)
         return
       }
 
       if (targetLanguage === currentLanguage) {
-        alert('Target language is the same as source language')
+        alert('Target language is the same as source language.')
         return
       }
 
-      const apiKey = import.meta.env.SANITY_STUDIO_OPENAI_API_KEY
-      if (!apiKey) {
-        console.error('❌ API key missing!')
-        console.error('Create a .env.local file with: SANITY_STUDIO_OPENAI_API_KEY=your-key-here')
-        alert('API key missing. Add SANITY_STUDIO_OPENAI_API_KEY to .env.local and restart the server.')
+      console.log(`🌐 Translating to ${targetLanguage.toUpperCase()}...`)
+
+      // 1️⃣ Extract text content
+      const texts: string[] = []
+      const structure: { blockIndex: number; childIndex: number }[] = []
+
+      if (typeof doc.title === 'string' && doc.title.trim()) {
+        texts.push(doc.title)
+        structure.push({ blockIndex: -1, childIndex: -1 })
+      }
+
+      if (Array.isArray(doc.body)) {
+        doc.body.forEach((block, bIndex) => {
+          if (block._type === 'block' && Array.isArray(block.children)) {
+            block.children.forEach((child: any, cIndex: number) => {
+              if (typeof child.text === 'string' && child.text.trim()) {
+                texts.push(child.text)
+                structure.push({ blockIndex: bIndex, childIndex: cIndex })
+              }
+            })
+          }
+        })
+      }
+
+      if (texts.length === 0) {
+        alert('No text to translate.')
         return
       }
 
-      console.log(`🔄 Translating to ${targetLanguage.toUpperCase()}... (this may take a moment)`)
+      // 2️⃣ Send to your OpenAI API proxy
+      const prompt = `
+Translate each of the following ${texts.length} text items to idiomatic ${targetLanguage}. 
+Return a JSON array exactly like: {"results": ["...", "...", "..."]}.
+Do not add commentary or formatting. Items:
+${JSON.stringify(texts)}
+`
 
-      console.log('📝 Starting translation...')
-      console.log('Source language:', currentLanguage)
-      console.log('Target language:', targetLanguage)
-      
-      const OpenAI = (await import('openai')).default
-      const openai = new OpenAI({apiKey, dangerouslyAllowBrowser: true})
+      const response = await fetch('https://mozart-api-kwzz.onrender.com/api/openai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt }),
+      })
 
-      const delay = translationConfig.delayBetweenRequests || 100
-
-      console.log('📄 Translating title...')
-      const translatedTitle = await translateText(
-        openai,
-        (doc as TranslationDocument).title || '',
-        targetLanguage
-      )
-      console.log('✅ Title translated:', translatedTitle)
-      
-      // Delay before translating body to avoid rate limiting
-      if (delay > 0) {
-        await sleep(delay)
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status} ${response.statusText}`)
       }
 
-      let translatedBody = (doc as TranslationDocument).body
-      if (translatedBody && Array.isArray(translatedBody)) {
-        console.log(`📄 Translating ${translatedBody.length} content blocks...`)
-        translatedBody = await translatePortableText(openai, translatedBody, targetLanguage)
-        console.log('✅ Content blocks translated')
+      const data = await response.json()
+      if (!data?.ok || !data.data) {
+        console.error('Unexpected response from API:', data)
+        alert('Translation failed — invalid API response. Check console.')
+        return
       }
 
-      const languageNames: {[key: string]: string} = {
-        en: 'English',
-        de: 'Deutsch',
-        es: 'Español',
-        fr: 'Français',
-        no: 'Norsk',
-      }
+      const parsed = JSON.parse(data.data)
+      const translatedResults: string[] = parsed.results || []
+      let translatedTitle = doc.title
+      let translatedBody = Array.isArray(doc.body) ? structuredClone(doc.body) : []
 
+      structure.forEach((pos, i) => {
+        const translated = translatedResults[i] || ''
+        if (pos.blockIndex === -1) {
+          translatedTitle = translated
+        } else if (
+          translatedBody[pos.blockIndex]?._type === 'block' &&
+          translatedBody[pos.blockIndex].children[pos.childIndex]
+        ) {
+          translatedBody[pos.blockIndex].children[pos.childIndex].text = translated
+        }
+      })
+
+      // 3️⃣ Resulting document
       const translatedDoc = {
         _type: props.type,
         language: targetLanguage,
         title: translatedTitle,
         body: translatedBody,
-        author: (doc as TranslationDocument).author,
-        categories: (doc as TranslationDocument).categories,
-        mainImage: (doc as TranslationDocument).mainImage,
-        publishedAt: (doc as TranslationDocument).publishedAt,
+        author: doc.author,
+        categories: doc.categories,
+        mainImage: doc.mainImage,
+        publishedAt: doc.publishedAt,
       }
 
-      console.log('=== 🎉 TRANSLATION COMPLETE ===')
-      console.log('Title:', translatedTitle)
-      console.log('Target Language:', targetLanguage)
-      console.log('Full Translated Document:', JSON.stringify(translatedDoc, null, 2))
-      console.log('===============================')
-
-      alert(`Translation complete! ${languageNames[currentLanguage]} → ${languageNames[targetLanguage]}\n\nCheck the browser console (F12) for the full translation.`)
-
-      console.log('\n📋 NEXT STEPS:')
-      console.log('1. Create a new', props.type)
-      console.log('2. Set language to:', languageNames[targetLanguage])
-      console.log('3. Copy the translated data from console above')
-      console.log('4. Paste into the new document')
-
+      console.log('✅ Translation complete:')
+      console.log(JSON.stringify(translatedDoc, null, 2))
+      alert('Translation complete! See console (F12) for the result.')
     } catch (error) {
       console.error('❌ Translation error:', error)
-      const errorMsg = error instanceof Error ? error.message : 'Unknown error'
-      
-      alert(`Translation failed: ${errorMsg}\n\nCheck the browser console (F12) for details.`)
-      
-      console.error('Full error:', error)
+      alert(`Translation failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    } finally {
+      isTranslating = false
     }
   }
 
-  return {
-    label: 'Translate with AI',
-    icon: TranslateIcon,
-    onHandle: handleTranslate,
-  }
-}
-
-async function translateText(
-  openai: any,
-  text: string,
-  targetLanguage: string
-): Promise<string> {
-  if (!text || !text.trim()) return text
-
-  const response = await openai.chat.completions.create({
-    model: translationConfig.model,
-    temperature: translationConfig.temperature,
-    messages: [
-      {role: 'system', content: translationConfig.systemPrompt},
-      {
-        role: 'user',
-        content: `Translate to ${targetLanguage}:\n\n${text}`,
-      },
-    ],
-  })
-
-  return response.choices[0]?.message?.content || text
-}
-
-async function translatePortableText(
-  openai: any,
-  blocks: any[],
-  targetLanguage: string
-): Promise<any[]> {
-  const translatedBlocks = []
-  let blockNum = 0
-  const delay = translationConfig.delayBetweenRequests || 100
-
-  for (const block of blocks) {
-    blockNum++
-    
-    if (block._type === 'block' && block.children && Array.isArray(block.children)) {
-      const hasText = block.children.some((child: any) => child.text && child.text.trim())
-
-      if (hasText) {
-        console.log(`  Translating block ${blockNum}/${blocks.length}...`)
-        
-        const translatedChildren = []
-        for (const child of block.children) {
-          if (child.text) {
-            const translatedText = await translateText(openai, child.text, targetLanguage)
-            translatedChildren.push({
-              ...child,
-              text: translatedText,
-            })
-            
-            // Add delay between requests to avoid rate limiting
-            if (delay > 0) {
-              await sleep(delay)
-            }
-          } else {
-            translatedChildren.push(child)
-          }
-        }
-        
-        translatedBlocks.push({
-          ...block,
-          children: translatedChildren,
-        })
-      } else {
-        translatedBlocks.push(block)
-      }
-    } else {
-      translatedBlocks.push(block)
-    }
-  }
-
-  return translatedBlocks
+  return { label: 'Translate with AI', icon: TranslateIcon, onHandle: handleTranslate }
 }
