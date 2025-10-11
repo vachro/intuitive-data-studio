@@ -35,10 +35,43 @@ export default defineType({
       name: 'mainImage',
       title: 'Main image',
       type: 'image',
-      options: {
-        hotspot: true,
-      },
+      options: { hotspot: true },
+      fields: [
+        {
+          name: 'alt',
+          type: 'string',
+          title: 'Alternative text',
+        },
+        {
+          name: 'caption',
+          type: 'string',
+          title: 'Caption',
+        },
+      ],
     }),
+
+    // 🟦 NEW FIELD: SEO Image for Open Graph / Social sharing
+    defineField({
+      name: 'seoImage',
+      title: 'SEO Image (for Open Graph & social media)',
+      type: 'image',
+      options: { hotspot: true },
+      fields: [
+        {
+          name: 'alt',
+          type: 'string',
+          title: 'Alternative text',
+        },
+        {
+          name: 'caption',
+          type: 'string',
+          title: 'Caption',
+        },
+      ],
+      description:
+        'Used for social media previews (Facebook, Twitter, LinkedIn). If not set, the main image will be used instead.',
+    }),
+
     defineField({
       name: 'categories',
       title: 'Categories',
@@ -61,15 +94,20 @@ export default defineType({
     select: {
       title: 'title',
       author: 'author.name',
-      media: 'mainImage',
+      media: 'seoImage', // prioritér SEO-bildet i forhåndsvisning
+      fallbackMedia: 'mainImage',
       language: 'language',
     },
     prepare(selection) {
-      const {author, language} = selection
+      const {author, language, media, fallbackMedia, title} = selection
       const langFlag = language ? `[${language.toUpperCase()}]` : ''
       const authorText = author ? `by ${author}` : ''
       const subtitle = [langFlag, authorText].filter(Boolean).join(' ')
-      return {...selection, subtitle: subtitle || undefined}
+      return {
+        title,
+        subtitle: subtitle || undefined,
+        media: media || fallbackMedia, // bruk SEO-bildet om det finnes, ellers mainImage
+      }
     },
   },
 })
