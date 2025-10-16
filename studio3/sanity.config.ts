@@ -3,7 +3,6 @@ import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
 import {documentInternationalization} from '@sanity/document-internationalization'
 import {schemaTypes} from './schemaTypes'
-import {translateDocumentAction} from './actions/translateDocument'
 
 export default defineConfig({
   name: 'default',
@@ -33,7 +32,7 @@ export default defineConfig({
 
   document: {
     actions: (prev, context) => {
-      return [...prev, translateDocumentAction]
+      return [...prev]
     },
   },
 
