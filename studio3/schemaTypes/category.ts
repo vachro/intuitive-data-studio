@@ -17,7 +17,7 @@ export default defineType({
       type: 'string',
     }),
     defineField({
-      name: 'parthSegment',
+      name: 'pathSegment',
       title: 'Path Segment',
       type: 'string',
     }),
