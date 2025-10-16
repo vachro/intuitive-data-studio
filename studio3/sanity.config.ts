@@ -32,7 +32,7 @@ export default defineConfig({
 
   document: {
     actions: (prev, context) => {
-      return [...prev]
+      return prev;
     },
   },
 
