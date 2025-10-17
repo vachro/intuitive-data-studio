@@ -67,7 +67,7 @@ export const translateAction = (getClient: any): DocumentActionComponent =>
           const res = await fetch("https://mozart-api-kwzz.onrender.com/api/translate", {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ body: chunks[i], targetLang }),
+            body: JSON.stringify({ content: chunks[i], targetLang }),
           })
 
           if (!res.ok) {
