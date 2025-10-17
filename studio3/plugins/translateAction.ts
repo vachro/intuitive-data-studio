@@ -31,7 +31,9 @@ function splitBodyArray(body: any[], maxChars = 250_000) {
  */
 function inheritSanityDoc(doc: Record<string, any>, overrides: Record<string, any> = {}) {
   const cleaned = Object.fromEntries(
-    Object.entries(doc).filter(([key]) => !key.startsWith('_'))
+    Object.entries(doc).filter(([key]) =>
+      key === "_type" ? true : !key.startsWith("_")
+    )
   )
   return { ...cleaned, ...overrides }
 }
