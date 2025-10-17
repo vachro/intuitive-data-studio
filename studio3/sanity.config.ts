@@ -3,6 +3,7 @@ import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
 import {documentInternationalization} from '@sanity/document-internationalization'
 import {schemaTypes} from './schemaTypes'
+import {translateAction} from './plugins/translateAction'
 
 export default defineConfig({
   name: 'default',
@@ -32,7 +33,11 @@ export default defineConfig({
 
   document: {
     actions: (prev, context) => {
-      return prev;
+      if (context.schemaType === 'post') {
+        // inject client from context
+        return [translateAction(context.getClient), ...prev]
+      }
+      return prev
     },
   },
 
