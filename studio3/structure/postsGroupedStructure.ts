@@ -7,26 +7,20 @@ export const postsGroupedStructure = (S: StructureBuilder) => {
     .child(
       S.documentList()
         .title('Grouped Posts')
-        // Show English/base posts
+        // Base (English) posts only
         .filter('_type == "post" && language == "en"')
         .defaultOrdering([{ field: 'title', direction: 'asc' }])
-        // For each English post, show its translations
+        // For each base post, show all translations connected through translation.metadata
         .child((docId) =>
           S.documentList()
             .title('Translations')
             .filter(
               `
               _type == "post" &&
-              (
-                // The base post itself
-                _id == $docId ||
-
-                // Any post that references the same translation.metadata document
-                references(*[
-                  _type == "translation.metadata" &&
-                  references($docId)
-                ]._id)
-              )
+              _id in *[
+                _type == "translation.metadata" &&
+                references($docId)
+              ][0].translations[].value->_id
               `
             )
             .params({ docId })
