@@ -1,9 +1,10 @@
-import {defineConfig} from 'sanity'
-import {structureTool} from 'sanity/structure'
-import {visionTool} from '@sanity/vision'
-import {documentInternationalization} from '@sanity/document-internationalization'
-import {schemaTypes} from './schemaTypes'
-import {translateAction} from './plugins/translateAction'
+import { defineConfig } from 'sanity'
+import { structureTool } from 'sanity/structure'
+import { visionTool } from '@sanity/vision'
+import { documentInternationalization } from '@sanity/document-internationalization'
+import { schemaTypes } from './schemaTypes'
+import { translateAction } from './plugins/translateAction'
+import { postsGroupedStructure } from './structure/postsGroupedStructure'
 
 export default defineConfig({
   name: 'default',
@@ -13,15 +14,27 @@ export default defineConfig({
   dataset: 'production',
 
   plugins: [
-    structureTool(),
+    structureTool({
+      structure: (S) =>
+        S.list()
+          .title('Content')
+          .items([
+            // ✅ Keep existing items
+            S.documentTypeListItem('translation.metadata').title('Translation metadata'),
+            S.documentTypeListItem('post').title('Post'),
+            postsGroupedStructure(S), // ✅ New grouped view
+            S.documentTypeListItem('author').title('Author'),
+            S.documentTypeListItem('category').title('Category'),
+          ]),
+    }),
     visionTool(),
     documentInternationalization({
       supportedLanguages: [
-        {id: 'en', title: 'English'},
-        {id: 'de', title: 'Deutsch'},
-        {id: 'es', title: 'Español'},
-        {id: 'fr', title: 'Français'},
-        {id: 'no', title: 'Norsk'},
+        { id: 'en', title: 'English' },
+        { id: 'de', title: 'Deutsch' },
+        { id: 'es', title: 'Español' },
+        { id: 'fr', title: 'Français' },
+        { id: 'no', title: 'Norsk' },
       ],
       schemaTypes: ['post', 'category'],
     }),
@@ -34,7 +47,6 @@ export default defineConfig({
   document: {
     actions: (prev, context) => {
       if (context.schemaType === 'post') {
-        // inject client from context
         return [translateAction(context.getClient), ...prev]
       }
       return prev
