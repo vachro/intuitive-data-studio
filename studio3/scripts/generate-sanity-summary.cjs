@@ -83,7 +83,6 @@ async function loadGitignore(root) {
 // MAIN
 // ----------------------------
 (async () => {
-  console.log("🧭 Generating Sanity project summary...");
   const ig = await loadGitignore(ROOT);
 
   // Finn alle filer
@@ -202,5 +201,4 @@ async function loadGitignore(root) {
 
   // Write markdown
   await fsp.writeFile(OUT_MD, summaryLines.join("\n"), "utf8");
-  console.log(`✅ Sanity summary written to: ${path.relative(ROOT, OUT_MD)}`);
 })();
