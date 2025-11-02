@@ -41,9 +41,24 @@ export default defineType({
     defineArrayMember({
       type: 'image',
       options: {hotspot: true},
+      fields: [
+        {
+          title: 'Caption',
+          name: 'caption',
+          type: 'string',
+          options: {
+            isHighlighted: true, // viser feltet rett under bildet i Studio
+          },
+        },
+        {
+          title: 'Attribution',
+          name: 'attribution',
+          type: 'string',
+        },
+      ],
     }),
     defineArrayMember({
-      type: 'youtube',  // <-- Nytt YouTube-felt
+      type: 'youtube', // behold YouTube-feltet ditt
     }),
   ],
 })
