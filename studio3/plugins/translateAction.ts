@@ -1,21 +1,14 @@
 // plugins/translateAction.ts
 import { DocumentActionProps, DocumentActionComponent } from 'sanity'
 
-/**
- * Sanity Document Action for server-side AI translation
- * - Uses the language list from sanity.config.ts (documentInternationalization.supportedLanguages)
- * - Calls the external translation API
- */
 export const translateAction = (getClient: any): DocumentActionComponent =>
   (props: DocumentActionProps) => {
     const { id, type } = props
     if (type !== 'post') return null
 
-    // Prøv å hente språklisten fra Sanity-config hvis tilgjengelig
     let supportedLanguages: { id: string; title: string }[] = []
 
     try {
-      // Dette er litt hacky men fungerer i Sanity context (globalThis.SanityConfig kan brukes)
       const sanityConfig =
         (globalThis as any).__sanity_config__ ||
         (window as any).__sanity_config__ ||
@@ -29,7 +22,6 @@ export const translateAction = (getClient: any): DocumentActionComponent =>
       supportedLanguages = []
     }
 
-    // fallback hvis config ikke kan hentes
     if (!supportedLanguages.length) {
       supportedLanguages = [
         { id: 'en', title: 'English' },
@@ -65,37 +57,31 @@ export const translateAction = (getClient: any): DocumentActionComponent =>
           const match = supportedLanguages.find((l) => l.id === targetLang)
           const langName = match ? match.title : targetLang.toUpperCase()
 
-          alert(`Starting translation to ${langName}.\nThis may take 1–2 minutes.`)
+          alert(`Starting translation to ${langName}.\nYou can safely navigate away — translation continues in background.`)
 
-          console.log(`[TranslateAction] Calling server to translate ${id} → ${targetLang}`)
+          console.log(`[TranslateAction] Queuing translation for ${id} → ${targetLang}`)
 
-          const res = await fetch('https://mozart-api-kwzz.onrender.com/api/translate', {
+          // Fire-and-forget pattern — don't await the fetch result
+          fetch('https://mozart-api-kwzz.onrender.com/api/translate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ documentId: id, targetLang }),
+          }).then(res => {
+            if (!res.ok) {
+              console.warn('[TranslateAction] Background translation response not OK:', res.status)
+            }
+          }).catch(err => {
+            console.warn('[TranslateAction] Background translation may still succeed:', err)
           })
 
-          if (!res.ok) {
-            const errText = await res.text()
-            console.error('[TranslateAction] API error:', errText)
-            alert(`Translation failed: ${res.statusText}`)
-            return
-          }
-
-          const data = await res.json()
-          console.log('[TranslateAction] Translation complete:', data)
-
-          if (data.success) {
-            alert(`✅ Translation completed!\n\nNew document: ${data.result.title}`)
-          } else {
-            alert(`⚠️ Translation did not complete successfully.`)
-          }
-
+          // Return immediately — no long wait
           props.onComplete()
+
         } catch (err) {
           const message = err instanceof Error ? err.message : String(err)
           console.error('[TranslateAction] Unexpected error:', message)
           alert(`An unexpected error occurred: ${message}`)
+          props.onComplete()
         }
       },
     }
