@@ -50,7 +50,6 @@ export default defineType({
       ],
     }),
 
-
     defineField({
       name: 'categories',
       title: 'Categories',
@@ -62,10 +61,21 @@ export default defineType({
       title: 'Published at',
       type: 'datetime',
     }),
+
     defineField({
       name: 'body',
       title: 'Body',
       type: 'blockContent',
+    }),
+
+    //
+    // ✅ Nytt felt: Sources
+    //
+    defineField({
+      name: 'sources',
+      title: 'Sources',
+      type: 'blockContent',
+      description: 'Kilder og referanser som vises nederst i artikkelen.',
     }),
   ],
 
@@ -73,7 +83,7 @@ export default defineType({
     select: {
       title: 'title',
       author: 'author.name',
-      media: 'seoImage', // prioritér SEO-bildet i forhåndsvisning
+      media: 'seoImage',
       fallbackMedia: 'mainImage',
       language: 'language',
     },
@@ -85,7 +95,7 @@ export default defineType({
       return {
         title,
         subtitle: subtitle || undefined,
-        media: media || fallbackMedia, // bruk SEO-bildet om det finnes, ellers mainImage
+        media: media || fallbackMedia,
       }
     },
   },
