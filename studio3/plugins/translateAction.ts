@@ -24,11 +24,25 @@ export const translateAction = (getClient: any): DocumentActionComponent =>
 
     if (!supportedLanguages.length) {
       supportedLanguages = [
-        { id: 'en', title: 'English' },
         { id: 'no', title: 'Norsk' },
-        { id: 'fr', title: 'Français' },
+        { id: 'sv', title: 'Svenska' },
+        { id: 'da', title: 'Dansk' },
+        { id: 'fi', title: 'Suomi' },
+        { id: 'en', title: 'English' },
         { id: 'de', title: 'Deutsch' },
+        { id: 'fr', title: 'Français' },
         { id: 'es', title: 'Español' },
+        { id: 'it', title: 'Italiano' },
+        { id: 'pt', title: 'Português' },
+        { id: 'nl', title: 'Nederlands' },
+        { id: 'pl', title: 'Polski' },
+        { id: 'cs', title: 'Čeština' },
+        { id: 'sk', title: 'Slovenčina' },
+        { id: 'ru', title: 'Русский' },
+        { id: 'tr', title: 'Türkçe' },
+        { id: 'ja', title: '日本語' },
+        { id: 'zh', title: '中文' },
+        { id: 'ko', title: '한국어' },
       ]
     }
 

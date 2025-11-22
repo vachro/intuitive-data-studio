@@ -1,8 +1,8 @@
 import {defineField, defineType} from 'sanity'
 
 export default defineType({
-  name: 'category',
-  title: 'Category',
+  name: 'post',
+  title: 'Post',
   type: 'document',
   fields: [
     defineField({
@@ -17,27 +17,85 @@ export default defineType({
       type: 'string',
     }),
     defineField({
-      name: 'pathSegment',
-      title: 'Path Segment',
-      type: 'string',
+      name: 'slug',
+      title: 'Slug',
+      type: 'slug',
+      options: {
+        source: 'title',
+        maxLength: 96,
+      },
     }),
     defineField({
-      name: 'description',
-      title: 'Description',
-      type: 'text',
+      name: 'author',
+      title: 'Author',
+      type: 'reference',
+      to: {type: 'author'},
+    }),
+    defineField({
+      name: 'mainImage',
+      title: 'Main image',
+      type: 'image',
+      options: { hotspot: true },
+      fields: [
+        {
+          name: 'alt',
+          type: 'string',
+          title: 'Alternative text',
+        },
+        {
+          name: 'caption',
+          type: 'string',
+          title: 'Caption',
+        },
+      ],
+    }),
+
+    defineField({
+      name: 'categories',
+      title: 'Categories',
+      type: 'array',
+      of: [{type: 'reference', to: {type: 'category'}}],
+    }),
+    defineField({
+      name: 'publishedAt',
+      title: 'Published at',
+      type: 'datetime',
+    }),
+
+    defineField({
+      name: 'body',
+      title: 'Body',
+      type: 'blockContent',
+    }),
+
+    //
+    // ✅ Nytt felt: Sources
+    //
+    defineField({
+      name: 'sources',
+      title: 'Sources',
+      type: 'blockContent',
+      description: 'Kilder og referanser som vises nederst i artikkelen.',
     }),
   ],
+
   preview: {
     select: {
       title: 'title',
+      author: 'author.name',
+      media: 'seoImage',
+      fallbackMedia: 'mainImage',
       language: 'language',
     },
     prepare(selection) {
-      const {title, language} = selection
+      const {author, language, media, fallbackMedia, title} = selection
       const langFlag = language ? `[${language.toUpperCase()}]` : ''
+      const authorText = author ? `by ${author}` : ''
+      const subtitle = [langFlag, authorText].filter(Boolean).join(' ')
       return {
         title,
-        subtitle: langFlag || undefined,
+        subtitle: subtitle || undefined,
+        media: media || fallbackMedia,
       }
     },
   },
