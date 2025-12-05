@@ -63,6 +63,13 @@ export default defineType({
     }),
 
     defineField({
+      name: 'lede',
+      title: 'Lede',
+      type: 'blockContent',
+      description: 'Quickly tells the reader what the story is about and makes them want to keep reading',
+    }),
+
+    defineField({
       name: 'body',
       title: 'Body',
       type: 'blockContent',
