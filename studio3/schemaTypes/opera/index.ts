@@ -5,6 +5,7 @@ import operaBeat from './operaBeat'
 import musicalNumber from './musicalNumber'
 import librettoText from './librettoText'
 import operaCharacter from './operaCharacter'
+import numberSinger from './numberSinger'
 
 export const operaSchemaTypes = [
   opera,
@@ -12,4 +13,5 @@ export const operaSchemaTypes = [
   musicalNumber,
   librettoText,
   operaCharacter,
+  numberSinger,
 ]
