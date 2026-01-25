@@ -5,6 +5,7 @@ import { documentInternationalization } from '@sanity/document-internationalizat
 import { schemaTypes } from './schemaTypes'
 import { translateAction } from './plugins/translateAction'
 import { postsGroupedStructure } from './structure/postsGroupedStructure'
+import {operaStructure} from './structure/operaStructure'
 
 export default defineConfig({
   name: 'default',
@@ -25,6 +26,8 @@ export default defineConfig({
             postsGroupedStructure(S), // ✅ New grouped view
             S.documentTypeListItem('author').title('Author'),
             S.documentTypeListItem('category').title('Category'),
+            S.divider(),
+            operaStructure(S),
           ]),
     }),
     visionTool(),
