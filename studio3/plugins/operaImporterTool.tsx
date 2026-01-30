@@ -1,7 +1,21 @@
-import React, {useEffect, useMemo, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 
-type BundlesResponse = {ok: boolean; bundles?: string[]; error?: string}
-type ImportResponse = {ok: boolean; filename?: string; operaId?: string; transactionId?: string; error?: string}
+type BundlesResponse = {
+  ok: boolean
+  bundles?: string[]
+  error?: string
+}
+
+type ImportResponse = {
+  ok: boolean
+  filename?: string
+  operaId?: string
+  transactionId?: string
+  error?: string
+}
+
+// 🔹 Same backend as translateAction
+const API_BASE = 'https://mozart-api-kwzz.onrender.com'
 
 export function OperaImporterTool() {
   const [bundles, setBundles] = useState<string[]>([])
@@ -10,19 +24,20 @@ export function OperaImporterTool() {
   const [error, setError] = useState<string | null>(null)
   const [lastResult, setLastResult] = useState<ImportResponse | null>(null)
 
-  const apiBase = useMemo(() => {
-    // If Studio is served from the same host as your API, this works.
-    // If not, set VITE_API_BASE in Studio env and use import.meta.env.VITE_API_BASE.
-    return ''
-  }, [])
-
   async function loadBundles() {
     setLoading(true)
     setError(null)
+
     try {
-      const res = await fetch(`${apiBase}/api/opera/bundles`, {method: 'GET'})
+      const res = await fetch(`${API_BASE}/api/opera/bundles`, {
+        method: 'GET',
+      })
+
       const json = (await res.json()) as BundlesResponse
-      if (!res.ok || !json.ok) throw new Error(json.error || `HTTP ${res.status}`)
+      if (!res.ok || !json.ok) {
+        throw new Error(json.error || `HTTP ${res.status}`)
+      }
+
       setBundles(json.bundles || [])
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
@@ -36,14 +51,19 @@ export function OperaImporterTool() {
     setBusyFile(filename)
     setError(null)
     setLastResult(null)
+
     try {
-      const res = await fetch(`${apiBase}/api/opera/import-file`, {
+      const res = await fetch(`${API_BASE}/api/opera/import-file`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({filename}),
       })
+
       const json = (await res.json()) as ImportResponse
-      if (!res.ok || !json.ok) throw new Error(json.error || `HTTP ${res.status}`)
+      if (!res.ok || !json.ok) {
+        throw new Error(json.error || `HTTP ${res.status}`)
+      }
+
       setLastResult(json)
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
@@ -77,9 +97,19 @@ export function OperaImporterTool() {
 
       {lastResult?.ok && (
         <div style={{marginTop: 12, padding: 12, border: '1px solid #51cf66'}}>
-          <div><strong>Imported:</strong> {lastResult.filename}</div>
-          {lastResult.operaId && <div><strong>Opera ID:</strong> {lastResult.operaId}</div>}
-          {lastResult.transactionId && <div><strong>Transaction:</strong> {lastResult.transactionId}</div>}
+          <div>
+            <strong>Imported:</strong> {lastResult.filename}
+          </div>
+          {lastResult.operaId && (
+            <div>
+              <strong>Opera ID:</strong> {lastResult.operaId}
+            </div>
+          )}
+          {lastResult.transactionId && (
+            <div>
+              <strong>Transaction:</strong> {lastResult.transactionId}
+            </div>
+          )}
         </div>
       )}
 
