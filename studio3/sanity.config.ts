@@ -1,6 +1,7 @@
 import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
 import { visionTool } from '@sanity/vision'
+import { OperaImporterTool } from './plugins/operaImporterTool'
 import { documentInternationalization } from '@sanity/document-internationalization'
 import { schemaTypes } from './schemaTypes'
 import { translateAction } from './plugins/translateAction'
@@ -20,6 +21,11 @@ export default defineConfig({
         S.list()
           .title('Content')
           .items([
+            S.listItem()
+              .title('Opera Import')
+              .child(S.component(OperaImporterTool).title('Opera Import')),
+
+            S.divider(),
             // ✅ Keep existing items
             S.documentTypeListItem('translation.metadata').title('Translation metadata'),
             S.documentTypeListItem('post').title('Post'),
