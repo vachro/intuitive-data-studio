@@ -28,7 +28,7 @@ export default defineType({
       title: 'Act',
       type: 'number',
       description: 'Act in which this number appears.',
-      validation: (Rule) => Rule.integer().min(1),
+      validation: (Rule) => Rule.integer().min(0),
     }),
 
     defineField({
@@ -36,7 +36,7 @@ export default defineType({
       title: 'Order in opera',
       type: 'number',
       description: 'Sequential order of the number within the opera.',
-      validation: (Rule) => Rule.integer().min(1),
+      validation: (Rule) => Rule.integer().min(0),
     }),
 
     defineField({
@@ -45,7 +45,7 @@ export default defineType({
       type: 'array',
       description: 'Characters performing this number and their voice types.',
       of: [{type: 'numberSinger'}],
-      validation: (Rule) => Rule.min(1),
+      validation: (Rule) => Rule.min(0),
     }),
 
     defineField({

@@ -17,7 +17,7 @@ export default defineType({
       name: 'defaultVoiceType',
       title: 'Default voice type',
       type: 'string',
-      options: {list: ['Soprano', 'Mezzo-soprano', 'Contralto', 'Tenor', 'Baritone', 'Bass', 'Choir']},
+      options: {list: ['Soprano', 'Mezzo-soprano', 'Contralto', 'Tenor', 'Baritone', 'Bass', 'Choir', 'Treble']},
     }),
     defineField({name: 'description', title: 'Description', type: 'blockContent'}),
     defineField({name: 'icon', title: 'Icon', type: 'image', description: 'Small figure icon for UI chips.'}),
