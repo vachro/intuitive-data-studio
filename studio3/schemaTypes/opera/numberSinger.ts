@@ -15,6 +15,7 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      
       name: 'voiceType',
       title: 'Voice type',
       type: 'string',
@@ -27,6 +28,7 @@ export default defineType({
           'Baritone',
           'Bass',
           'Choir',
+          'Treble'
         ],
       },
       validation: (Rule) => Rule.required(),
