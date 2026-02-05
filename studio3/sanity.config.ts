@@ -10,6 +10,8 @@ import { operaStructure } from './structure/operaStructure'
 import { makeDuplicateOperaAction } from "./plugins/duplicateOperaAction";
 import { makeFixNumberSingerCharacterRefsAction } from "./plugins/fixMusicalNumberCharacterRefsAction";
 import { makeDeleteDottedIdAction } from "./plugins/deleteDottedIdAction";
+import { makeFixMusicalNumberOperaRefAction } from "./plugins/fixMusicalNumberOperaRefAction";
+
 
 
 
@@ -90,6 +92,9 @@ export default defineConfig({
         )
       ) {
         return [makeDeleteDottedIdAction(), ...prev];
+      }
+      if (context.schemaType === "musicalNumber") {
+        return [makeFixMusicalNumberOperaRefAction(context.getClient), ...prev];
       }
       return prev
     },
