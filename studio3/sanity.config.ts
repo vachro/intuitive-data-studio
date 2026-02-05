@@ -8,6 +8,8 @@ import { translateAction } from './plugins/translateAction'
 import { postsGroupedStructure } from './structure/postsGroupedStructure'
 import {operaStructure} from './structure/operaStructure'
 import { makeDuplicateOperaAction } from "./plugins/duplicateOperaAction";
+import { makeFixNumberSingerCharacterRefsAction } from "./plugins/fixNumberSingerCharacterRefsAction";
+
 
 
 export default defineConfig({
@@ -77,6 +79,9 @@ export default defineConfig({
       if (context.schemaType === "opera") {
         return [makeDuplicateOperaAction(context.getClient), ...prev];
       }
+      if (context.schemaType === "musicalNumber") {
+      return [makeFixNumberSingerCharacterRefsAction(context.getClient), ...prev];
+    }
       return prev
     },
   },
