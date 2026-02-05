@@ -15,7 +15,5 @@ export const operaStructure = (S: StructureBuilder) =>
           S.documentTypeListItem('musicalNumber').title('Musical numbers'),
           S.documentTypeListItem('operaCharacter').title('Characters'),
           S.documentTypeListItem('librettoText').title('Libretti'),
-          S.documentTypeListItem('numberSinger').title('Singers'),
-          S.documentTypeListItem('operaBeat').title('Beats'),
         ])
     )

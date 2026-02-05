@@ -7,6 +7,8 @@ import { schemaTypes } from './schemaTypes'
 import { translateAction } from './plugins/translateAction'
 import { postsGroupedStructure } from './structure/postsGroupedStructure'
 import {operaStructure} from './structure/operaStructure'
+import { makeDuplicateOperaAction } from "./plugins/duplicateOperaAction";
+
 
 export default defineConfig({
   name: 'default',
@@ -71,6 +73,9 @@ export default defineConfig({
     actions: (prev, context) => {
       if (context.schemaType === 'post') {
         return [translateAction(context.getClient), ...prev]
+      }
+      if (context.schemaType === "opera") {
+        return [makeDuplicateOperaAction(context.getClient), ...prev];
       }
       return prev
     },
