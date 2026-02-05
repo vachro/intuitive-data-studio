@@ -1,7 +1,7 @@
 import type { DocumentActionComponent } from "sanity";
 import type { SanityClient } from "@sanity/client";
 
-function toCleanOperaId(oldId: string) {
+function toCleanId(oldId: string) {
   return oldId.replace(/\./g, "-");
 }
 
@@ -10,7 +10,31 @@ function stripSystemFields(doc: Record<string, unknown>) {
   return rest as Record<string, unknown>;
 }
 
-export function makeDuplicateOperaAction(getClient: (opts: { apiVersion: string }) => SanityClient): DocumentActionComponent {
+async function copyDocIfDotted(client: SanityClient, oldId: string): Promise<string> {
+  if (!oldId.includes(".")) return oldId;
+
+  const newId = toCleanId(oldId);
+
+  const existing = await client.getDocument(newId);
+  if (existing) return newId;
+
+  const src = await client.getDocument(oldId);
+  if (!src) return oldId;
+
+  const base = stripSystemFields(src as any);
+
+  await client.createIfNotExists({
+    ...base,
+    _id: newId,
+    _type: (src as any)._type,
+  } as any);
+
+  return newId;
+}
+
+export function makeDuplicateOperaAction(
+  getClient: (opts: { apiVersion: string }) => SanityClient
+): DocumentActionComponent {
   const DuplicateOperaAction: DocumentActionComponent = (props) => {
     const { id, type, draft, published } = props;
 
@@ -22,25 +46,49 @@ export function makeDuplicateOperaAction(getClient: (opts: { apiVersion: string 
         try {
           const client = getClient({ apiVersion: "2026-02-04" });
 
-          const source = draft || published;
+          const source = (draft || published) as any;
           if (!source) {
             props.onComplete();
             return;
           }
 
-          const newId = toCleanOperaId(id);
+          const newOperaId = toCleanId(id);
 
-          const existing = await client.getDocument(newId);
-          if (existing) {
+          const exists = await client.getDocument(newOperaId);
+          if (exists) {
             props.onComplete();
             return;
           }
 
-          const newDoc = stripSystemFields(source);
+          // Copy & rewire refs for numbers
+          const numbers = Array.isArray(source.numbers) ? source.numbers : [];
+          const newNumbers = [];
+          for (const ref of numbers) {
+            const oldRefId = ref?._ref;
+            if (typeof oldRefId !== "string") continue;
+
+            const newRefId = await copyDocIfDotted(client, oldRefId);
+            newNumbers.push({ ...ref, _ref: newRefId });
+          }
+
+          // Copy & rewire refs for characters
+          const characters = Array.isArray(source.characters) ? source.characters : [];
+          const newCharacters = [];
+          for (const ref of characters) {
+            const oldRefId = ref?._ref;
+            if (typeof oldRefId !== "string") continue;
+
+            const newRefId = await copyDocIfDotted(client, oldRefId);
+            newCharacters.push({ ...ref, _ref: newRefId });
+          }
+
+          const baseOpera = stripSystemFields(source);
           const payload = {
-            ...newDoc,
-            _id: newId,
+            ...baseOpera,
+            _id: newOperaId,
             _type: "opera",
+            numbers: newNumbers,
+            characters: newCharacters,
           };
 
           await client.createIfNotExists(payload as any);
