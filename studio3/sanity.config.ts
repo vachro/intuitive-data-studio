@@ -6,9 +6,10 @@ import { documentInternationalization } from '@sanity/document-internationalizat
 import { schemaTypes } from './schemaTypes'
 import { translateAction } from './plugins/translateAction'
 import { postsGroupedStructure } from './structure/postsGroupedStructure'
-import {operaStructure} from './structure/operaStructure'
+import { operaStructure } from './structure/operaStructure'
 import { makeDuplicateOperaAction } from "./plugins/duplicateOperaAction";
-import { makeFixNumberSingerCharacterRefsAction } from "./plugins/fixNumberSingerCharacterRefsAction";
+import { makeFixNumberSingerCharacterRefsAction } from "./plugins/fixMusicalNumberCharacterRefsAction";
+import { makeDeleteDottedIdAction } from "./plugins/deleteDottedIdAction";
 
 
 
@@ -80,8 +81,16 @@ export default defineConfig({
         return [makeDuplicateOperaAction(context.getClient), ...prev];
       }
       if (context.schemaType === "musicalNumber") {
-      return [makeFixNumberSingerCharacterRefsAction(context.getClient), ...prev];
-    }
+        return [makeFixNumberSingerCharacterRefsAction(context.getClient), ...prev];
+
+      }
+      if (
+        ["opera", "musicalNumber", "operaCharacter"].includes(
+          context.schemaType
+        )
+      ) {
+        return [makeDeleteDottedIdAction(), ...prev];
+      }
       return prev
     },
   },
