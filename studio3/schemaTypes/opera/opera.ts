@@ -72,6 +72,13 @@ export default defineType({
     }),
 
     defineField({
+      name: 'spotifyLink',
+      title: 'Spotify Link',
+      type: 'string', 
+      description: 'Paste a Spotify URL (https://open.spotify.com/...) or URI (spotify:track:...)',
+    }),
+
+    defineField({
       name: 'tabs',
       title: 'Tabs configuration',
       type: 'object',
@@ -93,13 +100,7 @@ export default defineType({
           title: 'Enable Characters tab',
           type: 'boolean',
           initialValue: true,
-        }),
-        defineField({
-          name: 'enableReferenceTab',
-          title: 'Enable Reference tab',
-          type: 'boolean',
-          initialValue: true,
-        }),
+        })
       ],
     }),
 
@@ -125,13 +126,6 @@ export default defineType({
       title: 'Characters (index)',
       type: 'array',
       of: [{type: 'reference', to: [{type: 'operaCharacter'}]}],
-    }),
-
-    defineField({
-      name: 'sources',
-      title: 'Sources',
-      type: 'blockContent',
-      description: 'References shown at the bottom of the opera page.',
     }),
   ],
 

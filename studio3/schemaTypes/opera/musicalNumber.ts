@@ -24,6 +24,13 @@ export default defineType({
     }),
 
     defineField({
+      name: 'spotifyLink',
+      title: 'Spotify Link',
+      type: 'string', 
+      description: 'Paste a Spotify URL (https://open.spotify.com/...) or URI (spotify:track:...)',
+    }),
+
+    defineField({
       name: 'act',
       title: 'Act',
       type: 'number',
