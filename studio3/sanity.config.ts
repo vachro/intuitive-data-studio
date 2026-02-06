@@ -11,6 +11,8 @@ import { makeDuplicateOperaAction } from "./plugins/duplicateOperaAction";
 import { makeFixNumberSingerCharacterRefsAction } from "./plugins/fixMusicalNumberCharacterRefsAction";
 import { makeDeleteDottedIdAction } from "./plugins/deleteDottedIdAction";
 import { makeFixMusicalNumberOperaRefAction } from "./plugins/fixMusicalNumberOperaRefAction";
+import { makeFixCharacterOperaRefAction } from "./plugins/fixCharacterOperaRefAction";
+
 
 
 
@@ -74,42 +76,43 @@ export default defineConfig({
     types: schemaTypes,
   },
 
-document: {
-  actions: (prev, context) => {
-    const { schemaType, getClient } = context;
+  document: {
+    actions: (prev, context) => {
+      const { schemaType, getClient } = context;
 
-    // Post actions
-    if (schemaType === "post") {
-      return [translateAction(getClient), ...prev];
-    }
+      if (schemaType === "post") {
+        return [translateAction(getClient), ...prev];
+      }
 
-    // Shared cleanup action for multiple types
-    const dottedCleanupTypes = new Set(["opera", "musicalNumber", "operaCharacter"]);
-    const deleteDotted = dottedCleanupTypes.has(schemaType) ? [makeDeleteDottedIdAction()] : [];
+      const deleteDotted =
+        ["opera", "musicalNumber", "operaCharacter"].includes(schemaType)
+          ? [makeDeleteDottedIdAction()]
+          : [];
 
-    // Opera actions
-    if (schemaType === "opera") {
-      return [makeDuplicateOperaAction(getClient), ...deleteDotted, ...prev];
-    }
+      if (schemaType === "opera") {
+        return [makeDuplicateOperaAction(getClient), ...deleteDotted, ...prev];
+      }
 
-    // Musical number actions (multiple buttons)
-    if (schemaType === "musicalNumber") {
-      return [
-        makeFixMusicalNumberOperaRefAction(getClient),
-        makeFixNumberSingerCharacterRefsAction(getClient),
-        ...deleteDotted,
-        ...prev,
-      ];
-    }
+      if (schemaType === "musicalNumber") {
+        return [
+          makeFixMusicalNumberOperaRefAction(getClient),
+          makeFixNumberSingerCharacterRefsAction(getClient),
+          ...deleteDotted,
+          ...prev,
+        ];
+      }
 
-    // Opera character actions
-    if (schemaType === "operaCharacter") {
-      return [...deleteDotted, ...prev];
-    }
+      if (schemaType === "operaCharacter") {
+        return [
+          makeFixCharacterOperaRefAction(getClient),
+          ...deleteDotted,
+          ...prev,
+        ];
+      }
 
-    return prev;
+      return prev;
+    },
   },
-},
 
 
   server: {
