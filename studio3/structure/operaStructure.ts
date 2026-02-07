@@ -1,6 +1,6 @@
 import {StructureBuilder} from 'sanity/structure'
 // Optional: Import icons if you want them
-import {DocumentsIcon, UsersIcon, BookIcon, MusicNoteIcon} from '@sanity/icons'
+import {DocumentsIcon, UsersIcon, BookIcon} from '@sanity/icons'
 
 export const operaStructure = (S: StructureBuilder) =>
   S.listItem()
@@ -18,7 +18,7 @@ export const operaStructure = (S: StructureBuilder) =>
           // 2. Musical Numbers -> Grouped by Opera
           S.listItem()
             .title('Musical Numbers')
-            .icon(MusicNoteIcon)
+            .icon(BookIcon)
             .child(
               S.documentTypeList('opera') // Lists all operas first
                 .title('Select Opera')
