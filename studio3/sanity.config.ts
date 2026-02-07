@@ -7,12 +7,6 @@ import { schemaTypes } from './schemaTypes'
 import { translateAction } from './plugins/translateAction'
 import { postsGroupedStructure } from './structure/postsGroupedStructure'
 import { operaStructure } from './structure/operaStructure'
-import { makeDuplicateOperaAction } from "./plugins/duplicateOperaAction";
-import { makeFixNumberSingerCharacterRefsAction } from "./plugins/fixMusicalNumberCharacterRefsAction";
-import { makeDeleteDottedIdAction } from "./plugins/deleteDottedIdAction";
-import { makeFixMusicalNumberOperaRefAction } from "./plugins/fixMusicalNumberOperaRefAction";
-import { makeFixCharacterOperaRefAction } from "./plugins/fixCharacterOperaRefAction";
-import { makeFixOperaDeepIdsAndRefsAction } from "./plugins/fixOperaDeepIdsAndRefsAction";
 
 
 
@@ -84,37 +78,6 @@ document: {
 
     if (schemaType === "post") {
       return [translateAction(getClient), ...prev];
-    }
-
-    const deleteDotted =
-      ["opera", "musicalNumber", "operaCharacter"].includes(schemaType)
-        ? [makeDeleteDottedIdAction()]
-        : [];
-
-    if (schemaType === "opera") {
-      return [
-        makeDuplicateOperaAction(getClient),
-        makeFixOperaDeepIdsAndRefsAction(getClient),
-        ...deleteDotted,
-        ...prev,
-      ];
-    }
-
-    if (schemaType === "musicalNumber") {
-      return [
-        makeFixMusicalNumberOperaRefAction(getClient),
-        makeFixNumberSingerCharacterRefsAction(getClient),
-        ...deleteDotted,
-        ...prev,
-      ];
-    }
-
-    if (schemaType === "operaCharacter") {
-      return [
-        makeFixCharacterOperaRefAction(getClient),
-        ...deleteDotted,
-        ...prev,
-      ];
     }
 
     return prev;
