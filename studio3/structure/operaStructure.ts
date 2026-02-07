@@ -1,50 +1,46 @@
 import {StructureBuilder} from 'sanity/structure'
-// You can import icons from @sanity/icons if installed, or remove the .icon() calls below
-import {DocumentsIcon, UsersIcon, BookIcon, AsteriskIcon} from '@sanity/icons'
+import {DocumentsIcon, UsersIcon, BookIcon, MusicNoteIcon} from '@sanity/icons'
 
 export const operaStructure = (S: StructureBuilder) =>
   S.listItem()
-    .title('Operas')
+    .title('Opera Database')
+    .icon(DocumentsIcon)
     .child(
-      // 1. List all Operas
-      S.documentTypeList('opera')
-        .title('Select an Opera')
-        .child((operaId) =>
-          // 2. When an Opera is selected, show a specific list of content for IT
-          S.list()
-            .title('Opera Content')
-            .items([
-              // A. The Main Opera Document
-              S.documentListItem()
-                .schemaType('opera')
-                .id(operaId)
-                .title('Opera Details')
-                .icon(DocumentsIcon),
+      S.list()
+        .title('Content')
+        .items([
+          // 1. All Operas List
+          S.documentTypeListItem('opera').title('All Operas'),
 
-              S.divider(),
+          S.divider(),
 
-              // B. Musical Numbers (Filtered)
-              S.listItem()
-                .title('Musical Numbers')
-                .icon(AsteriskIcon)
-                .child(
+          // 2. Musical Numbers (Grouped by Opera)
+          S.listItem()
+            .title('Musical Numbers')
+            .icon(MusicNoteIcon)
+            .child(
+              S.documentTypeList('opera')
+                .title('Select Opera')
+                .child((operaId) =>
                   S.documentList()
                     .title('Musical Numbers')
                     .schemaType('musicalNumber')
-                    // Filter: Only show items where the 'opera' reference matches the current ID
                     .filter('_type == "musicalNumber" && opera._ref == $operaId')
                     .params({operaId})
-                    // Context: Pass the operaId so new items can auto-populate (requires templates config)
                     .initialValueTemplates([
                       S.initialValueTemplateItem('musicalNumber-by-opera', {operaId})
                     ])
-                ),
+                )
+            ),
 
-              // C. Characters (Filtered)
-              S.listItem()
-                .title('Characters')
-                .icon(UsersIcon)
-                .child(
+          // 3. Characters (Grouped by Opera)
+          S.listItem()
+            .title('Characters')
+            .icon(UsersIcon)
+            .child(
+              S.documentTypeList('opera')
+                .title('Select Opera')
+                .child((operaId) =>
                   S.documentList()
                     .title('Characters')
                     .schemaType('operaCharacter')
@@ -53,13 +49,17 @@ export const operaStructure = (S: StructureBuilder) =>
                     .initialValueTemplates([
                       S.initialValueTemplateItem('operaCharacter-by-opera', {operaId})
                     ])
-                ),
+                )
+            ),
 
-              // D. Libretti (Filtered)
-              S.listItem()
-                .title('Libretti')
-                .icon(BookIcon)
-                .child(
+          // 4. Libretti (Grouped by Opera)
+          S.listItem()
+            .title('Libretti')
+            .icon(BookIcon)
+            .child(
+              S.documentTypeList('opera')
+                .title('Select Opera')
+                .child((operaId) =>
                   S.documentList()
                     .title('Libretti')
                     .schemaType('librettoText')
@@ -68,7 +68,7 @@ export const operaStructure = (S: StructureBuilder) =>
                     .initialValueTemplates([
                       S.initialValueTemplateItem('librettoText-by-opera', {operaId})
                     ])
-                ),
-            ])
-        )
+                )
+            ),
+        ])
     )
