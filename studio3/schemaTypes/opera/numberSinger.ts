@@ -1,5 +1,3 @@
-// schemaTypes/opera/numberSinger.ts
-
 import {defineField, defineType} from 'sanity'
 
 export default defineType({
@@ -15,7 +13,6 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      
       name: 'voiceType',
       title: 'Voice type',
       type: 'string',
@@ -34,4 +31,18 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
   ],
+  // 👇 This logic fixes the list display
+  preview: {
+    select: {
+      // This grabs the 'name' field from the referenced 'operaCharacter' document
+      characterName: 'character.name',
+      voice: 'voiceType',
+    },
+    prepare({characterName, voice}) {
+      return {
+        title: characterName || 'No character selected',
+        subtitle: voice,
+      }
+    },
+  },
 })
