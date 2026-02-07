@@ -1,16 +1,15 @@
 import {StructureBuilder} from 'sanity/structure'
-// Optional: Import icons if you want them
 import {DocumentsIcon, UsersIcon, BookIcon} from '@sanity/icons'
 
 export const operaStructure = (S: StructureBuilder) =>
   S.listItem()
     .title('Operas')
-    .icon(DocumentsIcon) // Optional icon
+    .icon(DocumentsIcon)
     .child(
       S.list()
         .title('Opera content')
         .items([
-          // 1. The list of all Opera documents (Keep as is)
+          // 1. All Operas
           S.documentTypeListItem('opera').title('All Operas'),
 
           S.divider(),
@@ -20,16 +19,14 @@ export const operaStructure = (S: StructureBuilder) =>
             .title('Musical Numbers')
             .icon(BookIcon)
             .child(
-              S.documentTypeList('opera') // Lists all operas first
+              S.documentTypeList('opera')
                 .title('Select Opera')
                 .child((operaId) =>
                   S.documentList()
                     .title('Musical Numbers')
                     .schemaType('musicalNumber')
-                    // Show only numbers belonging to this operaId
                     .filter('_type == "musicalNumber" && opera._ref == $operaId')
                     .params({operaId})
-                    // Enable "Create New" with auto-selected opera
                     .initialValueTemplates([
                       S.initialValueTemplateItem('musicalNumber-by-opera', {operaId})
                     ])

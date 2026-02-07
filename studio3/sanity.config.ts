@@ -70,6 +70,39 @@ export default defineConfig({
 
   schema: {
     types: schemaTypes,
+    templates: (prev) => [
+      ...prev,
+      {
+        id: 'musicalNumber-by-opera',
+        title: 'Musical Number by Opera',
+        description: 'Musical Number belonging to a specific opera',
+        schemaType: 'musicalNumber',
+        parameters: [{name: 'operaId', type: 'string'}],
+        value: ({operaId}: {operaId: string}) => ({
+          opera: {_type: 'reference', _ref: operaId},
+        }),
+      },
+      {
+        id: 'operaCharacter-by-opera',
+        title: 'Character by Opera',
+        description: 'Character belonging to a specific opera',
+        schemaType: 'operaCharacter',
+        parameters: [{name: 'operaId', type: 'string'}],
+        value: ({operaId}: {operaId: string}) => ({
+          opera: {_type: 'reference', _ref: operaId},
+        }),
+      },
+      {
+        id: 'librettoText-by-opera',
+        title: 'Libretto by Opera',
+        description: 'Libretto belonging to a specific opera',
+        schemaType: 'librettoText',
+        parameters: [{name: 'operaId', type: 'string'}],
+        value: ({operaId}: {operaId: string}) => ({
+          opera: {_type: 'reference', _ref: operaId},
+        }),
+      },
+    ]
   },
 
 document: {
