@@ -41,6 +41,12 @@ export default defineType({
     }),
 
     defineField({
+      name: 'premiereDate',
+      title: 'Premiere date',
+      type: 'string',
+    }),
+
+    defineField({
       name: 'originalLanguage',
       title: 'Original language',
       type: 'string',
