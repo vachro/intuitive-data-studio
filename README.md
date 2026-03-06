@@ -2,7 +2,7 @@
 
 # Intuitive Data Studio (Sanity)
 
-Sanity Studio for flere nettsteder (først ut: Mozart Portal).
+Sanity Studio for Mozart Portal.
 
 Studioet ligger i undermappe /studio1
 
@@ -11,11 +11,6 @@ schemaTypes/
   index.ts
   models/ (page, chapter, siteSettings)
   objects/ (imageWithCaption)
-
-## Content model
-- page: publiserbar underside (eks. “Kinder Room”) som består av en ordnet liste chapters[] (drag-and-drop).
-- chapter: gjenbrukbar byggekloss (tittel, ingress, bilde m/caption, brødtekst). Felt theme styrer stripe-bakgrunn i frontend.
-- siteSettings: global konfig; håndteres som singleton i Desk.
 
 Lettvekts i18n: language (nb, en, …) + translationKey (samme nøkkel binder oversettelser).
 
